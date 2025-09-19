@@ -1,0 +1,1 @@
+export default function SuccessPage(){return <div style={{padding:24}}><h1>✅ ¡Pago realizado con éxito!</h1></div>;}

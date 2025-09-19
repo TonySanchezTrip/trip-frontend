@@ -1,34 +1,13 @@
 <!doctype html>
-<html lang="es">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Mi Sitio · Demo Pago</title>
-    <style>
-      body{font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;display:grid;place-items:center;min-height:100dvh;margin:0;background:#0f1115;color:#eaeaea}
-      main{width:min(680px,90vw);background:#151923;padding:28px;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.3)}
-      h1{font-size:1.4rem;margin:0 0 8px}
-      p.sub{opacity:.75;margin:0 0 20px}
-      button{padding:12px 18px;border:0;border-radius:12px;cursor:pointer;font-weight:600}
-      #payBtn{background:#7c5cff;color:white}
-      #payBtn[disabled]{opacity:.6;cursor:not-allowed}
-      #msg{margin-top:14px;min-height:1.4em}
-      a{color:#9fc3ff}
-    </style>
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WebApp Interactiva</title>
   </head>
   <body>
-    <main>
-      <h1>Mi Tienda</h1>
-      <p class="sub">Producto de prueba $199 MXN (Stripe Checkout)</p>
-
-      <button id="payBtn">Pagar $199 MXN</button>
-      <p id="msg"></p>
-
-      <p style="margin-top:24px;opacity:.8">
-        Tras pagar, Stripe te regresará a <code>/success</code> o <code>/cancel</code> de este sitio.
-      </p>
-    </main>
-
-    <script type="module" src="/main.js"></script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

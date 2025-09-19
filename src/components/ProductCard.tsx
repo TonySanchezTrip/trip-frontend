@@ -1,25 +1,37 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
-import { redirectToCheckout } from '../utils/stripeCheckout'; // Import the utility
+import { redirectToCheckout } from '../utils/stripeCheckout';
 
 // Define a type for the product props to ensure type safety
 interface ProductCardProps {
   id: number;
-  images: string[]; // Now an array of image URLs
+  images: string[];   // array of image URLs
   name: string;
   description: string;
-  price: string;
-  category: string;
+  price: string;      // shown as formatted string in UI
+  category: string;   // we keep it as prop, but we DO NOT send it to addToCart
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ id, images, name, description, price, category }) => {
+const ProductCard: React.FC<ProductCardProps> = ({
+  id,
+  images,
+  name,
+  description,
+  price,
+  category, // not used in addToCart payload (CartItem type doesn't include it)
+}) => {
   const { addToCart } = useCart();
-  const [currentImage, setCurrentImage] = useState(images[0]);
+  const firstImage = images && images.length > 0 ? images[0] : '';
+  const [currentImage, setCurrentImage] = useState<string>(firstImage);
 
   const handleAddToCart = () => {
-    // Pass the first image URL to the cart item for display in cart
-    addToCart({ id, name, price, imageUrl: images[0], category });
+    addToCart({
+      id,
+      name,
+      price,
+      imageUrl: images && images.length > 0 ? images[0] : ''
+    });
   };
 
   const handleMouseEnter = () => {
@@ -29,18 +41,18 @@ const ProductCard: React.FC<ProductCardProps> = ({ id, images, name, description
   };
 
   const handleMouseLeave = () => {
-    setCurrentImage(images[0]); // Revert to the first image on mouse leave
+    setCurrentImage(firstImage); // Revert to the first image on mouse leave
   };
 
   const handleBuyNow = () => {
-    // Prepare item for direct checkout
+    // Prepare item for direct checkout (utility handles the backend call)
     const itemForCheckout = {
-      name: name,
-      description: description,
-      price: price,
-      quantity: 1, // Buy Now typically means 1 item
-      imageUrl: images[0], // Use the main image
-      // priceId: 'price_123', // If you have a pre-defined Stripe Price ID
+      name,
+      description,
+      price,          // if later you use dynamic pricing, convert to cents in the utility/backend
+      quantity: 1,    // Buy Now usually means 1 item
+      imageUrl: firstImage,
+      // priceId: 'price_123', // if you switch to Stripe predefined Prices
     };
     redirectToCheckout([itemForCheckout]);
   };
@@ -49,10 +61,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ id, images, name, description
     <div className="col">
       <div className="card h-100">
         <Link to={`/product/${id}`}>
-          <img 
-            src={currentImage} 
-            className="card-img-top" 
-            alt={name} 
+          <img
+            src={currentImage}
+            className="card-img-top"
+            alt={name}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
           />
@@ -67,8 +79,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ id, images, name, description
           <div className="d-flex justify-content-between align-items-center">
             <span className="fw-bold">{price}</span>
             <div>
-              <button className="btn btn-primary btn-sm me-2" onClick={handleAddToCart}>Añadir al Carrito</button>
-              <button className="btn btn-success btn-sm" onClick={handleBuyNow}>Comprar</button>
+              <button className="btn btn-primary btn-sm me-2" onClick={handleAddToCart}>
+                Añadir al Carrito
+              </button>
+              <button className="btn btn-success btn-sm" onClick={handleBuyNow}>
+                Comprar
+              </button>
             </div>
           </div>
         </div>

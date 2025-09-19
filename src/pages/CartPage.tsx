@@ -56,7 +56,11 @@ const CartPage: React.FC = () => {
             </ul>
           )}
           <div className="d-grid gap-2">
-            <Link to="/checkout" className="btn btn-success" disabled={cartItems.length === 0}>Proceder al Pago</Link>
+              {cartItems.length === 0 ? (
+    <button className="btn btn-success" disabled>Proceder al Pago</button>
+  ) : (
+    <Link to="/checkout" className="btn btn-success">Proceder al Pago</Link>
+  )}
             <button className="btn btn-outline-danger" onClick={clearCart} disabled={cartItems.length === 0}>Vaciar Carrito</button>
           </div>
         </div>

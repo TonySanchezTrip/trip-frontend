@@ -40,24 +40,26 @@ const NfcPage: React.FC = () => {
   }, [tagId]); // Re-fetch if tagId changes
 
   const handleNfcScan = async () => {
-    if ('NDEFReader' in window) {
-      try {
-        const ndef = new window.NDEFReader();
-        await ndef.scan();
-        setNfcStatus('Listo para escanear. Acerca una tarjeta NFC a tu dispositivo.');
-        ndef.onreadingerror = () => {
-          setNfcStatus('Error al leer la tarjeta NFC. Inténtalo de nuevo.');
-        };
-        ndef.onreading = event => {
-          const { serialNumber } = event;
-          setNfcStatus(`¡Tarjeta leída! Número de serie: ${serialNumber}`);
-        };
-      } catch (error) {
-        console.error('Error con la API de Web NFC:', error);
-        setNfcStatus('Hubo un error al iniciar el escáner NFC.');
-      }
-    } else {
-      setNfcStatus('La API de Web NFC no es compatible con este navegador.');
+    if (!('NDEFReader' in (window as any))) {
+      console.warn('Web NFC no soportado en este navegador');
+      setNfcStatus('La API de Web NFC no es compatible con este navegador.'); // Using existing setNfcStatus for user feedback
+      return;
+    }
+
+    try {
+      const ndef = new (window as any).NDEFReader();
+      await ndef.scan();
+      setNfcStatus('Listo para escanear. Acerca una tarjeta NFC a tu dispositivo.');
+      ndef.onreadingerror = () => {
+        setNfcStatus('Error al leer la tarjeta NFC. Inténtalo de nuevo.');
+      };
+      ndef.onreading = (event: any) => {
+        const { serialNumber } = event;
+        setNfcStatus(`¡Tarjeta leída! Número de serie: ${serialNumber}`);
+      };
+    } catch (error) {
+      console.error('Error con la API de Web NFC:', error);
+      setNfcStatus('Hubo un error al iniciar el escáner NFC.');
     }
   };
 

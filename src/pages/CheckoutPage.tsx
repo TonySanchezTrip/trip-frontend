@@ -5,8 +5,10 @@ import { useCart } from '../context/CartContext';
 import { useNavigate } from 'react-router-dom';
 
 const CheckoutPage: React.FC = () => {
-  const { cartItems, getCartTotal, clearCart } = useCart();
+  const { cartItems, getCartTotal } = useCart(); // clearCart se usa en SuccessPage
   const navigate = useNavigate();
+
+  const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     fullName: '',
@@ -31,32 +33,34 @@ const CheckoutPage: React.FC = () => {
       return;
     }
 
-    // Prepare items for Stripe Checkout
-    const itemsForStripe = cartItems.map(item => ({
-      // For simplicity, we're sending basic product info.
-      // In a real app, you'd send priceId if using pre-defined Stripe Products/Prices,
-      // or more detailed product_data for dynamic pricing.
-      name: item.name,
-      description: item.description,
-      price: item.price, // e.g., "$25.00"
-      quantity: item.quantity,
-      imageUrl: item.imageUrl, // Used for product_data in Stripe
-    }));
+    // (Opcional, para futuro) Si luego quieres cobrar dinámico, arma items y mándalos:
+    // const itemsForStripe = cartItems.map(item => ({
+    //   name: item.name,
+    //   unit_amount: Math.round(parseFloat(String(item.price).replace(/[^\d.]/g, '')) * 100), // centavos
+    //   quantity: item.quantity,
+    // }));
 
+    setLoading(true);
     try {
       const res = await fetch(`${BACKEND}/api/create-checkout-session`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: "{}"
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        // Hoy tu backend ignora el body; dejamos la estructura lista para futuro:
+        body: JSON.stringify({}) // o JSON.stringify({ items: itemsForStripe })
       });
+
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
       const { url } = await res.json();
       if (!url) throw new Error("Backend no devolvió 'url'");
-      window.location.href = url;
 
+      // Redirige a Stripe Checkout
+      window.location.href = url;
     } catch (error: any) {
       console.error('Error al iniciar el proceso de pago:', error);
       alert(`Error al iniciar el proceso de pago: ${error.message}`);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -105,7 +109,9 @@ const CheckoutPage: React.FC = () => {
               </div>
             </div>
             <hr className="my-4" />
-            <button className="w-100 btn btn-primary btn-lg" type="submit">Proceder al Pago con Stripe</button>
+            <button className="w-100 btn btn-primary btn-lg" type="submit" disabled={loading}>
+              {loading ? 'Creando sesión...' : 'Proceder al Pago con Stripe'}
+            </button>
           </form>
         </div>
 

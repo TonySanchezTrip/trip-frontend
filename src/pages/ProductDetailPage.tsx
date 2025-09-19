@@ -71,10 +71,13 @@ const ProductDetailPage: React.FC = () => {
     if (product) {
       // Add selected variations to the product object before adding to cart
       const productToAdd = {
-        ...product,
-        selectedSize: selectedSize || undefined,
-        selectedColor: selectedColor || undefined,
-        selectedNfcOption: selectedNfcOption || undefined,
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        imageUrl: product.images?.[0] ?? '',
+        selectedSize,
+        selectedColor,
+        selectedNfcOption: !!selectedNfcOption
       };
       addToCart(productToAdd);
     }
